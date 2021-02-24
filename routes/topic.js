@@ -17,16 +17,12 @@ router.get("/create", (req, res) => {
     title,
     list,
     `
-                <form action="/topic/create" method="post">
-                  <p><input type="text" name="title" placeholder="title"></p>
-                  <p>
-                    <textarea name="description" placeholder="description"></textarea>
-                  </p>
-                  <p>
-                    <input type="submit">
-                  </p>
-                </form>
-              `,
+    <form action="/topic/create" method="post">
+      <p><input type="text" name="title" placeholder="title"></p>
+      <p><textarea name="description" placeholder="description"></textarea></p>
+      <p><input type="submit"></p>
+    </form>
+    `,
     "",
     auth.statusUI(req)
   );
@@ -59,17 +55,13 @@ router.get("/update/:pageId", (req, res) => {
       title,
       list,
       `
-                <form action="/topic/update" method="post">
-                  <input type="hidden" name="id" value="${title}">
-                  <p><input type="text" name="title" placeholder="title" value="${title}"></p>
-                  <p>
-                    <textarea name="description" placeholder="description">${description}</textarea>
-                  </p>
-                  <p>
-                    <input type="submit">
-                  </p>
-                </form>
-                `,
+      <form action="/topic/update" method="post">
+        <input type="hidden" name="id" value="${title}">
+        <p><input type="text" name="title" placeholder="title" value="${title}"></p>
+        <p><textarea name="description" placeholder="description">${description}</textarea></p>
+        <p><input type="submit"></p>
+      </form>
+      `,
       `<a href="/topic/create">create</a> <a href="/topic/update/${title}">update</a>`,
       auth.statusUI(req)
     );
@@ -121,12 +113,14 @@ router.get("/:pageId", (req, res, next) => {
       sanitizedTitle,
       list,
       `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-      ` <a href="/topic/create">create</a>
-                      <a href="/topic/update/${sanitizeHtml(title)}">update</a>
-                      <form action="/topic/delete" method="post">
-                        <input type="hidden" name="id" value="${sanitizedTitle}">
-                        <input type="submit" value="delete">
-                      </form>`,
+      `
+      <a href="/topic/create">create</a> 
+      <a href="/topic/update/${sanitizeHtml(title)}">update</a>
+      <form action="/topic/delete" method="post">
+        <input type="hidden" name="id" value="${sanitizedTitle}">
+        <input type="submit" value="delete">
+      </form>
+      `,
       auth.statusUI(req)
     );
     res.send(html);
