@@ -8,7 +8,8 @@ const fs = require("fs");
 
 const express = require("express");
 const session = require("express-session");
-// const FileStore = require("session-file-store")(session);
+const LowdbStore = require("lowdb-session-store")(session);
+const db = require("./lib/db");
 const flash = require("connect-flash");
 
 const app = express();
@@ -27,7 +28,7 @@ app.use(
     secret: "@23t45623!#513res",
     resave: false,
     saveUninitialized: true,
-    // store: new FileStore(), // 파일 스토어를 이용하는 경우 세션 데이터를 파일로 저장하는 시간에 의해서 에러가 발생함
+    store: new LowdbStore(db.get("sessions"), { ttl: 86400 }),
   })
 );
 
