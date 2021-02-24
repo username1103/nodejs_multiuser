@@ -2,16 +2,8 @@ const express = require("express");
 const router = express.Router();
 const template = require("../lib/template");
 const auth = require("../lib/auth");
-
-const low = require("lowdb");
-const FileSync = require("lowdb/adapters/FileSync");
-
-const adapter = new FileSync("db.json");
-const db = low(adapter);
-db.defaults({ user: [] }).write();
-
+const db = require("../lib/db");
 const shortid = require("shortid");
-const { nextElementSibling } = require("domutils");
 
 module.exports = function (passport) {
   router.get("/login", (req, res) => {
@@ -91,14 +83,14 @@ module.exports = function (passport) {
     if (email === "" || password === "" || displayName === "") {
       req.flash("error", "모든 값을 채워주세요.");
       res.redirect("/auth/register");
-    } else if (db.get("user").find({ email: email }).value() !== undefined) {
+    } else if (db.get("users").find({ email: email }).value() !== undefined) {
       req.flash("error", "이미 존재하는 이메일 입니다.");
       res.redirect("/auth/register");
     } else if (password !== password_confirm) {
       req.flash("error", "비밀번호와 비밀번화 확인 값이 다릅니다.");
       res.redirect("/auth/register");
     } else if (
-      db.get("user").find({ displayName: displayName }).value() !== undefined
+      db.get("users").find({ displayName: displayName }).value() !== undefined
     ) {
       req.flash("error", "이미 존재하는 닉네임 입니다.");
       res.redirect("/auth/register");
@@ -109,7 +101,7 @@ module.exports = function (passport) {
         password: password,
         displayName: displayName,
       };
-      db.get("user").push(user).write();
+      db.get("users").push(user).write();
       req.login(user, (err) => {
         if (err) {
           return next(err);
