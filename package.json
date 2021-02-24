@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "pm2 start app.js --watch --ignore-watch=\"data/* sessions/* *.json\""
+    "test": "pm2 start app.js --watch --ignore-watch=\"data/* sessions/* *.json\"",
+    "start": "node app.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
