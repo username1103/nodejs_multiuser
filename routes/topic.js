@@ -5,6 +5,8 @@ const sanitizeHtml = require("sanitize-html");
 const path = require("path");
 const router = express.Router();
 const auth = require("../lib/auth");
+const db = require("../lib/db");
+const shortid = require("shortid");
 
 router.get("/create", (req, res) => {
   if (!auth.isOwner(req)) {
@@ -37,9 +39,17 @@ router.post("/create", (req, res) => {
   var post = req.body;
   var title = post.title;
   var description = post.description;
-  fs.writeFile(`./data/${title}`, description, "utf8", function (err) {
-    res.redirect(`/topic/${title}`);
-  });
+  const id = shortid.generate();
+  db.get("topics")
+    .push({
+      id: id,
+      title: title,
+      description: description,
+      user_id: req.user.id,
+      date: new Date(),
+    })
+    .write();
+  res.redirect(`/topic/${id}`);
 });
 
 router.get("/update/:pageId", (req, res) => {
@@ -98,33 +108,37 @@ router.post("/delete", (req, res) => {
   });
 });
 
-router.get("/:pageId", (req, res, next) => {
-  var filteredId = req.params.pageId;
-  fs.readFile(`./data/${filteredId}`, "utf8", function (err, description) {
-    if (err) return next(err);
-
-    var title = filteredId;
-    var sanitizedTitle = sanitizeHtml(title);
-    var sanitizedDescription = sanitizeHtml(description, {
-      allowedTags: ["h1", "a"],
-    });
-    var list = template.list(req.list);
-    var html = template.HTML(
-      sanitizedTitle,
-      list,
-      `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-      `
-      <a href="/topic/create">create</a> 
-      <a href="/topic/update/${sanitizeHtml(title)}">update</a>
-      <form action="/topic/delete" method="post">
-        <input type="hidden" name="id" value="${sanitizedTitle}">
-        <input type="submit" value="delete">
-      </form>
-      `,
-      auth.statusUI(req)
-    );
-    res.send(html);
+router.get("/:pageId", (req, res) => {
+  const topic = db.get("topics").find({ id: req.params.pageId }).value();
+  const author = db.get("users").find({ id: topic.user_id }).value();
+  const sanitizedTitle = sanitizeHtml(topic.title);
+  const sanitizedDescription = sanitizeHtml(topic.description, {
+    allowedTags: ["h1", "a"],
   });
+  const list = template.list(req.list);
+  const html = template.HTML(
+    sanitizedTitle,
+    list,
+    `
+    <h2>${sanitizedTitle}</h2>
+    <div>
+    <p>저자 : ${author.displayName}, 날짜 : ${topic.date}</p>
+    </div>
+    <div>
+    ${sanitizedDescription}
+    </div>
+    `,
+    `
+    <a href="/topic/create">create</a> 
+    <a href="/topic/update/${sanitizeHtml(topic.title)}">update</a>
+    <form action="/topic/delete" method="post">
+      <input type="hidden" name="id" value="${sanitizedTitle}">
+      <input type="submit" value="delete">
+    </form>
+    `,
+    auth.statusUI(req)
+  );
+  res.send(html);
 });
 
 module.exports = router;
