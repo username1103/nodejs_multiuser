@@ -40,10 +40,8 @@ const topicRouter = require("./routes/topic");
 const authRouter = require("./routes/auth")(passport);
 
 app.get("*", (req, res, next) => {
-  fs.readdir("./data", function (error, filelist) {
-    req.list = filelist;
-    next();
-  });
+  req.list = db.get("topics").value();
+  next();
 });
 
 app.use("/", indexRouter);
