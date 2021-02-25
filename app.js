@@ -4,7 +4,6 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 const logger = require("morgan");
 const helmet = require("helmet");
-const fs = require("fs");
 
 const express = require("express");
 const session = require("express-session");

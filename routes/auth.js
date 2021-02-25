@@ -4,6 +4,8 @@ const template = require("../lib/template");
 const auth = require("../lib/auth");
 const db = require("../lib/db");
 const shortid = require("shortid");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 module.exports = function (passport) {
   router.get("/login", (req, res) => {
@@ -95,18 +97,22 @@ module.exports = function (passport) {
       req.flash("error", "이미 존재하는 닉네임 입니다.");
       res.redirect("/auth/register");
     } else {
-      const user = {
-        id: shortid.generate(),
-        email: email,
-        password: password,
-        displayName: displayName,
-      };
-      db.get("users").push(user).write();
-      req.login(user, (err) => {
-        if (err) {
-          return next(err);
-        }
-        return res.redirect("/");
+      bcrypt.hash(password, saltRounds, function (err, hash) {
+        if (err) next(err);
+
+        const user = {
+          id: shortid.generate(),
+          email: email,
+          password: hash,
+          displayName: displayName,
+        };
+        db.get("users").push(user).write();
+        req.login(user, (err) => {
+          if (err) {
+            return next(err);
+          }
+          return res.redirect("/");
+        });
       });
     }
   });

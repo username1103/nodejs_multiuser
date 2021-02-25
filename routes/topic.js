@@ -1,6 +1,5 @@
 const express = require("express");
 const template = require("../lib/template");
-const fs = require("fs");
 const sanitizeHtml = require("sanitize-html");
 const path = require("path");
 const router = express.Router();
