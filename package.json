@@ -2,9 +2,13 @@
   "name": "nodejs-passport",
   "version": "0.0.0",
   "private": true,
+  "homepage": "https://username1103.github.io/nodejs_multiuser/",
   "scripts": {
     "test": "pm2 start app.js --watch --ignore-watch=\"data/* sessions/* *.json\"",
-    "start": "node app.js"
+    "start": "node app.js",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "build": "webpack"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
@@ -21,8 +25,12 @@
     "lowdb-session-store": "^1.1.1",
     "morgan": "~1.9.1",
     "passport": "^0.4.1",
+    "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "sanitize-html": "^2.3.2",
     "shortid": "^2.2.16"
+  },
+  "devDependencies": {
+    "gh-pages": "^3.1.0"
   }
 }

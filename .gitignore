@@ -1,6 +1,7 @@
-# data,node_modules 폴더 ignore
-data/
-node_modules/
-
 # db.json파일 ignore
 db.json
+
+# node_modules ignore
+node_modules/
+
+config/google.json
